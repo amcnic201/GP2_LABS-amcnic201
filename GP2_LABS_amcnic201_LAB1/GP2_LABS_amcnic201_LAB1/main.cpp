@@ -3,14 +3,17 @@
 
 //Header fo SDL2 functionality
 #include <SDL.h>
-
-
-
+#include <SDL_opengl.h>
+#include <gl\GLU.h>
 
 //Global Variables Go Here
 
 //Pointer to our SDL Windows
 SDL_Window*window;
+
+//SDL GL context
+SDL_GLContext glcontext = NULL;
+
 
 //Constant to control window creation
 const int WINDOW_WIDTH = 640;
@@ -45,7 +48,75 @@ void CleanUp()
 
 }
 
+//Function to initialise OpenGL
+void initOpenGL(){
 
+	//Create OpenGL context
+	glcontext = SDL_GL_CreateContext(window);
+		//Something went wrong in creating the conext if it is still NULL
+		if (!glcontext)
+		{
+		std::cout << "Error Creating OPenGl context" << SDL_GetError() <<
+			std::endl;
+		}
+
+		//Smooth shading 
+		glShadeModel(GL_SMOOTH);
+
+		//clear the background to black
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+		//Clear the depth buffer to 1.0
+		glClearDepth(1.0f);
+
+		//Enable depth testing
+		glEnable(GL_DEPTH_TEST);
+
+		//The dpeth test to use
+		glDepthFunc(GL_LEQUAL);
+
+		//Turn on the best perspective correction
+		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+
+
+}
+
+//Function tp set/reset viewport 
+
+void setViewport(int width, int height)
+{
+	//screen ration
+	GLfloat ratio;
+
+	//make sure height is always above 0
+	if (height == 0){
+		height = 1;
+
+	}
+
+	//calculate screen rotation
+	ratio = (GLfloat)width / (GLfloat)height;
+
+	//Setup viewport 
+	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+
+	//Change to project matrix mode
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	//Calculate perspective matrix,using glu library functions
+	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+
+	//Switch to ModelView
+	glMatrixMode(GL_MODELVIEW);
+
+	//Reset using the identity Matrix
+	glLoadIdentity();
+
+
+
+}
 
 //Main Method-Entry Point
 int main(int argc, char*arg[]){
