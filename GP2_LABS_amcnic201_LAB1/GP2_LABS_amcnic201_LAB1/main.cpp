@@ -1,11 +1,12 @@
 //Header Files
 #include <iostream>
-
+//#include <Vertex.h>
 //Header fo SDL2 functionality
 #include <GL/glew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <gl\GLU.h>
+
 
 //Global Variables Go Here
 
@@ -158,7 +159,11 @@ void render()
 	//Make the new VBO active.Repeat here as a sanity check
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
 
-	//Establish its 3 coordinates per vertex with zero stride(space between elements
+	//Establish its 3 coordinates per vertex with zero stride(space between elements)
+	glVertexPointer(3, GL_FLOAT, 0, NULL);
+
+	//Etablish array contains verices
+	glEnableClientState(GL_VERTEX_ARRAY);
 
 	//Swith to model view
 	glMatrixMode(GL_MODELVIEW);
@@ -182,7 +187,19 @@ void render()
 	//require tp swap the front and back buffer
 	SDL_GL_SwapWindow(window);
 
+	//Switch to modelView
+	glMatrixMode(GL_MODELVIEW);
 
+	//Reset using the Indentity matrix
+	glLoadIdentity();
+
+	//translate
+	glTranslatef(0.0f, 0.0f, -6.0f);
+
+	//Actually draw the trianlge,giving the number of vertices provided
+	glDrawArrays(GL_TRIANGLES, 0, sizeof(triangleData) / 3 * sizeof(float));
+
+	 
 
 }
 
