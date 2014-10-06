@@ -2,6 +2,7 @@
 #include <iostream>
 
 //Header fo SDL2 functionality
+#include <GL/glew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <gl\GLU.h>
@@ -19,6 +20,10 @@ SDL_GLContext glcontext = NULL;
 const int WINDOW_WIDTH = 640;
 const int WINDOW_HEIGHT = 480;
 bool running = true;
+float triangleData[] = { 0.0f, 1.0f, 0.0f, //top
+-1.0f, -1.0f, 0.0f, //Bottom left
+1.0f, -1.0f, 0.0f }; //Bottom Right
+GLuint triangleVBO;
 
 
 
@@ -43,6 +48,7 @@ void InitWindow(int width, int height, bool fullscreen) {
 
 void CleanUp()
 {
+	glDeleteBuffers(1, &triangleVBO);
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
 	SDL_Quit();
@@ -79,9 +85,30 @@ void initOpenGL(){
 		//Turn on the best perspective correction
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
+		GLenum err = glewInit();
+		if (GLEW_OK != err)
+		{
+			//Problem: glewInit failed, something is seriosuly worng.
+			std::cout << "Error" << glewGetErrorString(err) << std::endl;
+
+		}
+
 
 
 }
+
+void initGeometry()
+{
+	//Create buffer
+	glGenBuffers(1, &triangleVBO);
+	//Make the new VBO active 
+	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
+	//Copy the vertex Data to VBO
+	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleData),
+		triangleData,
+		GL_STATIC_DRAW);
+}
+
 
 //Function tp set/reset viewport 
 
@@ -124,15 +151,24 @@ void render()
 {
 	//Set the clear color (background)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
 	//clear the color and depth buffer
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	//Make the new VBO active.Repeat here as a sanity check
+	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
+
+	//Establish its 3 coordinates per vertex with zero stride(space between elements
+
 	//Swith to model view
 	glMatrixMode(GL_MODELVIEW);
+
 	//Reset using the identity matrix
 	glLoadIdentity();
+
 	//Translate to -5.0f on z axis
 	glTranslatef(0.0f, 0.0f, -5.0f);
+
 	//Begin drawing triangles
 	glBegin(GL_TRIANGLES);
 		glColor3f(1.0f, 0.0f, 0.0f); // Colour of ther vertices
@@ -171,6 +207,7 @@ int main(int argc, char*arg[]){
 
 	//Call our InitOpenGL function
 	initOpenGL();
+	initGeometry();
 	//Set our viewport
 	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
 
