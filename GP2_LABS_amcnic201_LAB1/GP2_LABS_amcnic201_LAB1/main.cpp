@@ -1,6 +1,6 @@
 //Header Files
 #include <iostream>
-//#include <Vertex.h>
+#include "Vertex.h"
 //Header fo SDL2 functionality
 #include <GL/glew.h>
 #include <SDL.h>
@@ -10,6 +10,7 @@
 
 //Global Variables Go Here
 
+GLuint triangleEBO;
 //Pointer to our SDL Windows
 SDL_Window*window;
 
@@ -21,9 +22,63 @@ SDL_GLContext glcontext = NULL;
 const int WINDOW_WIDTH = 640;
 const int WINDOW_HEIGHT = 480;
 bool running = true;
-float triangleData[] = { 0.0f, 1.0f, 0.0f, //top
--1.0f, -1.0f, 0.0f, //Bottom left
-1.0f, -1.0f, 0.0f }; //Bottom Right
+Vertex triangleData[] = { //Front
+		{-0.5f, 0.5f, 0.5f,
+		1.0f, 0.0f, 1.0f, 1.0f },// Top Left
+			
+		{-0.5f,-0.5f, 0.5f,
+		1.0f, 1.0f, 0.0f, 1.0f },// Bottom Left
+				
+		{ 0.5f,-0.5f, 0.5f,
+		0.0f, 1.0f, 1.0f, 1.0f }, //Bottom Right
+				
+		{ 0.5f, 0.5f, 0.5f,
+		1.0f, 0.0f, 1.0f, 1.0f },// Top Right
+				
+		//back
+		{-0.5f, 0.5f,-0.5f,
+		1.0f, 0.0f, 1.0f, 1.0f },// Top Left
+					
+		{-0.5f,-0.5f,-0.5f,
+		1.0f, 1.0f, 0.0f, 1.0f },// Bottom Left
+						
+		{ 0.5f,-0.5f,-0.5f,
+		0.0f, 1.0f, 1.0f, 1.0f }, //Bottom Right
+						
+		{ 0.5f, 0.5f,-0.5f,
+		1.0f, 0.0f, 1.0f, 1.0f },// Top Right
+
+} ;
+
+GLuint indices[] = {
+	//Front 
+	0, 1, 2,
+	0, 3, 2,
+
+	//Left
+	4, 5, 1,
+	4, 1, 0,
+
+	//right
+	3, 7, 2,
+	7, 6, 2,
+
+	//bottom
+	1, 5, 2,
+	6, 2, 1,
+
+	//top
+	5, 0, 7,
+	5, 7, 3,
+
+	//back
+	4, 5, 6,
+	4, 7, 6,
+
+
+};
+
+
 GLuint triangleVBO;
 
 
@@ -49,6 +104,7 @@ void InitWindow(int width, int height, bool fullscreen) {
 
 void CleanUp()
 {
+	glDeleteBuffers(1, &triangleEBO);
 	glDeleteBuffers(1, &triangleVBO);
 	SDL_GL_DeleteContext(glcontext);
 	SDL_DestroyWindow(window);
@@ -108,6 +164,14 @@ void initGeometry()
 	glBufferData(GL_ARRAY_BUFFER, sizeof(triangleData),
 		triangleData,
 		GL_STATIC_DRAW);
+
+	//create buufer
+	glGenBuffers(1, &triangleEBO);
+	//Make the EBO active
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
+	//Copy the index data to the ebo
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 }
 
 
@@ -159,17 +223,28 @@ void render()
 	//Make the new VBO active.Repeat here as a sanity check
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
 
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
+
 	//Establish its 3 coordinates per vertex with zero stride(space between elements)
-	glVertexPointer(3, GL_FLOAT, 0, NULL);
+	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), NULL);
+
+	//The last parameter basically says that the colours start 3 floats into 
+	//each element of the array
+	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (void**)(3 * sizeof(float)));
 
 	//Etablish array contains verices
 	glEnableClientState(GL_VERTEX_ARRAY);
+	glEnableClientState(GL_COLOR_ARRAY);
+
+	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
 	//Swith to model view
 	glMatrixMode(GL_MODELVIEW);
 
 	//Reset using the identity matrix
 	glLoadIdentity();
+
+	gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, - 1.0f, 0.0, 1.0, 0.0);
 
 	//Translate to -5.0f on z axis
 	glTranslatef(0.0f, 0.0f, -5.0f);
