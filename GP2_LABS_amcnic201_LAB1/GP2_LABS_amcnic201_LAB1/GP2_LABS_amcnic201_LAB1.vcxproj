@@ -57,7 +57,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\glew-1.11.0-win32\glew-1.11.0\lib\Release\Win32;C:\SDL2-2.0.3\lib\x86;C:\SDL2-devel-2.0.3-VC\SDL2-2.0.3\lib\x86;C:\Specialised Applications\glew-1.11.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\SDL2-2.0.3\lib\x86;C:\SDL2-devel-2.0.3-VC\SDL2-2.0.3\lib\x86;C:\glew-1.11.0-win32\glew-1.11.0\lib\Release MX\Release\Win32;C:\Specialised Applications\glew-1.11.0\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>SDL2.lib;SDL2main.lib;opengl32.lib;glu32.lib;glew32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
