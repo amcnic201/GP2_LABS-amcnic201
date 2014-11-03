@@ -7,6 +7,17 @@
 #include <SDL_opengl.h>
 #include <gl\GLU.h>
 
+#ifdef _DEBUG && WIN32
+const std::string ASSET_PATH = "../assets";
+#else
+const std::string ASSET_PATH = "assets";
+#endif
+
+const std::string SHADER_PATH = "/shaders";
+
+
+
+
 
 //Global Variables Go Here
 
@@ -115,6 +126,11 @@ void CleanUp()
 //Function to initialise OpenGL
 void initOpenGL(){
 
+	//Ask for version 3.2 of open GL
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
 	//Create OpenGL context
 	glcontext = SDL_GL_CreateContext(window);
 		//Something went wrong in creating the conext if it is still NULL
@@ -141,6 +157,8 @@ void initOpenGL(){
 
 		//Turn on the best perspective correction
 		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+		glewExperimental = GL_TRUE;
 
 		GLenum err = glewInit();
 		if (GLEW_OK != err)
@@ -194,18 +212,20 @@ void setViewport(int width, int height)
 	//Setup viewport 
 	glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 
+	//OLD FIXED FUNCTION FROM LAB 2
+
 	//Change to project matrix mode
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
+	//glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
 
 	//Calculate perspective matrix,using glu library functions
-	gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+	//gluPerspective(45.0f, ratio, 0.1f, 100.0f);
 
 	//Switch to ModelView
-	glMatrixMode(GL_MODELVIEW);
+	//glMatrixMode(GL_MODELVIEW);
 
 	//Reset using the identity Matrix
-	glLoadIdentity();
+	//glLoadIdentity();
 
 
 
@@ -226,36 +246,36 @@ void render()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
 
 	//Establish its 3 coordinates per vertex with zero stride(space between elements)
-	glVertexPointer(3, GL_FLOAT, sizeof(Vertex), NULL);
+	//glVertexPointer(3, GL_FLOAT, sizeof(Vertex), NULL);
 
 	//The last parameter basically says that the colours start 3 floats into 
 	//each element of the array
-	glColorPointer(4, GL_FLOAT, sizeof(Vertex), (void**)(3 * sizeof(float)));
+	//glColorPointer(4, GL_FLOAT, sizeof(Vertex), (void**)(3 * sizeof(float)));
 
 	//Etablish array contains verices
-	glEnableClientState(GL_VERTEX_ARRAY);
-	glEnableClientState(GL_COLOR_ARRAY);
+	//glEnableClientState(GL_VERTEX_ARRAY);
+	//glEnableClientState(GL_COLOR_ARRAY);
 
 	glDrawElements(GL_TRIANGLES, sizeof(indices) / sizeof(GLuint), GL_UNSIGNED_INT, 0);
 
 	//Swith to model view
-	glMatrixMode(GL_MODELVIEW);
+	//glMatrixMode(GL_MODELVIEW);
 
 	//Reset using the identity matrix
-	glLoadIdentity();
+	//glLoadIdentity();
 
-	gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, - 1.0f, 0.0, 1.0, 0.0);
+	//gluLookAt(0.0, 0.0, 0.0, 0.0, 0.0, - 1.0f, 0.0, 1.0, 0.0);
 
 	//Translate to -5.0f on z axis
-	glTranslatef(0.0f, 0.0f, -5.0f);
+	//glTranslatef(0.0f, 0.0f, -5.0f);
 
 	//Begin drawing triangles
-	glBegin(GL_TRIANGLES);
+	/*glBegin(GL_TRIANGLES);
 		glColor3f(1.0f, 0.0f, 0.0f); // Colour of ther vertices
 		glVertex3f(0.0f, 1.0f, 0.0f); // Top
 		glVertex3f(-1.0f, -1.0f, 0.0f); //Bottom left
 		glVertex3f(1.0f, -1.0f, 0.0f); //Bottom right
-		glEnd();
+		glEnd(); */
 
 
 
@@ -263,16 +283,16 @@ void render()
 	SDL_GL_SwapWindow(window);
 
 	//Switch to modelView
-	glMatrixMode(GL_MODELVIEW);
+	//glMatrixMode(GL_MODELVIEW);
 
 	//Reset using the Indentity matrix
-	glLoadIdentity();
+	//glLoadIdentity();
 
 	//translate
-	glTranslatef(0.0f, 0.0f, -6.0f);
+	//glTranslatef(0.0f, 0.0f, -6.0f);
 
 	//Actually draw the trianlge,giving the number of vertices provided
-	glDrawArrays(GL_TRIANGLES, 0, sizeof(triangleData) / 3 * sizeof(float));
+	//glDrawArrays(GL_TRIANGLES, 0, sizeof(triangleData) / 3 * sizeof(float));
 
 	 
 
