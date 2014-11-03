@@ -6,6 +6,12 @@ GLuint loadShaderFromMemory(const char * pMem, SHADER_TYPE shaderType)
 	GLuint program = glCreateShader(shaderType);
 	glShaderSource(program, 1, &pMem, NULL);
 	glCompileShader(program);
+
+	if (checkForCompilerErrors(program))
+	{
+		return  0;
+	}
+
 	return program;
 }
 
@@ -47,9 +53,17 @@ GLuint loadShaderFromFile(const std::string& filename, SHADER_TYPE shaderType)
 
 	}
 
+
+
 	return 0;
 
 }
+
+//The following function uses glgetShaderiv to get the parameters from a shader object
+//the middle parameter defines what you are attempting to retrieve from the shader object.
+//This means that the fuction checks to see if we compiled the file,if not we then get 
+//the length oif the log. We call glGetShaderInfoLog to fill out this string 
+//with the error message
 
 bool checkForCompilerErrors(GLuint shaderProgram)
 {
@@ -74,3 +88,26 @@ bool checkForCompilerErrors(GLuint shaderProgram)
 	
 	return false;
 }
+
+bool checkforLinkErrors(GLuint program)
+{
+	GLint isLinked = 0;
+	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
+	if (isLinked == GL_FALSE){
+
+		GLint maxLength = 0;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+
+		//The maxLength includes the NULL character
+		std::string infoLog;
+		glGetShaderInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+
+		std::cout << "Shader not linked" << infoLog << std::endl;
+
+		//We dont need the shader anymore.
+		glDeleteProgram(program);
+		return true;
+	}
+	return false;
+
+	}

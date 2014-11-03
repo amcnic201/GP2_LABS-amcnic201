@@ -225,11 +225,20 @@ void setViewport(int width, int height)
 	//glMatrixMode(GL_MODELVIEW);
 
 	//Reset using the identity Matrix
-	//glLoadIdentity();
+	//glLoadIdeity();
 
 
 
 }
+
+void createShader()
+{
+	GLuint vertexShaderProgram = 0;
+	std::string vsPath = ASSET_PATH + SHADER_PATH + "/simpleVS.glsl";
+	vertexShaderProgram
+}
+
+GLuint shaderProgram = 0;
 
 //Function to draw
 void render()
@@ -303,6 +312,8 @@ void update()
 {
 
 }
+
+
 
 //Main Method-Entry Point
 int main(int argc, char*arg[]){

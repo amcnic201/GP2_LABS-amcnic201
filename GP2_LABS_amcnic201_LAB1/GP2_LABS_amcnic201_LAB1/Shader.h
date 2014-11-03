@@ -19,4 +19,7 @@ GLuint loadShaderFromMemory(const char* pMem, SHADER_TYPE shaderType);
 
 bool checkForCompilerErrors(GLuint shaderProgram);
 
+bool checkForLinkErrors(Gluint program);
+
+
 #endif
