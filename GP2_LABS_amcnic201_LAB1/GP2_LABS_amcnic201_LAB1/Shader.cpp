@@ -110,4 +110,4 @@ bool checkforLinkErrors(GLuint program)
 	}
 	return false;
 
-	}
+}

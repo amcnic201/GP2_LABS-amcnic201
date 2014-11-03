@@ -1,23 +1,35 @@
 //Header Files
 #include <iostream>
 #include "Vertex.h"
+#include "Shader.h"
 //Header fo SDL2 functionality
 #include <GL/glew.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <gl\GLU.h>
 
+//maths headers
+#include <glm/glm.hpp>
+using glm::mat4;
+using glm::vec3;
+
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
+//matrices
+mat4 viewMatrix;
+mat4 projMatrix;
+mat4 worldMatrix;
+
+
+
 #ifdef _DEBUG && WIN32
-const std::string ASSET_PATH = "../assets";
+const std::string ASSET_PATH = "assets";
 #else
 const std::string ASSET_PATH = "assets";
 #endif
 
 const std::string SHADER_PATH = "/shaders";
-
-
-
-
 
 //Global Variables Go Here
 
@@ -115,6 +127,7 @@ void InitWindow(int width, int height, bool fullscreen) {
 
 void CleanUp()
 {
+	glDeleteProgram(shaderProgram);
 	glDeleteBuffers(1, &triangleEBO);
 	glDeleteBuffers(1, &triangleVBO);
 	SDL_GL_DeleteContext(glcontext);
@@ -225,7 +238,7 @@ void setViewport(int width, int height)
 	//glMatrixMode(GL_MODELVIEW);
 
 	//Reset using the identity Matrix
-	//glLoadIdeity();
+	//glLoadIdentity();
 
 
 
@@ -235,7 +248,25 @@ void createShader()
 {
 	GLuint vertexShaderProgram = 0;
 	std::string vsPath = ASSET_PATH + SHADER_PATH + "/simpleVS.glsl";
-	vertexShaderProgram
+	vertexShaderProgram = loadShaderFromFile(vsPath, VERTEX_SHADER);
+
+	GLuint fragmentShaderProgram = 0;
+	std::string fsPath = ASSET_PATH + SHADER_PATH + "/simpleFS.glsl";
+	fragmentShaderProgram = loadShaderFromFile(fsPath, FRAGMENT_SHADER);
+
+	shaderProgram + glCreateProgram();
+	glAttachShader(shaderProgram, vertexShaderProgram);
+	glAttachShader(shaderProgram, fragmentShaderProgram);
+	glLinkProgram(shaderProgram);
+	checkForLinkErrors(shaderProgram);
+
+	glBindAttribLocation(shaderProgram, 0, "vertexPosition");
+
+
+	//Now we can delete the VS and FS programs
+	glDeleteShader(vertexShaderProgram);
+	glDeleteShader(fragmentShaderProgram);
+
 }
 
 GLuint shaderProgram = 0;
@@ -253,6 +284,17 @@ void render()
 	glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, triangleEBO);
+
+	glUseProgram(shaderProgram);
+
+	GLint MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
+	mat4 MVP = projMatrix*viewMatrix*worldMatrix;
+	glUniformMatrix4fv(MVPLocation, 1, GL_FALSE, glm::value_ptr(MVP));
+
+	//Tell the shader that 0 is the position element
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+
 
 	//Establish its 3 coordinates per vertex with zero stride(space between elements)
 	//glVertexPointer(3, GL_FLOAT, sizeof(Vertex), NULL);
@@ -310,6 +352,16 @@ void render()
 //Function to update the game state
 void update()
 {
+	//projMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH) / 
+		//(float)WINDOW_HEIGHT, 0.1f, 100.0f);
+
+	projMatrix = glm::perspective(45.0f, (float)WINDOW_WIDTH /
+		(float)WINDOW_HEIGHT, 0.1f, 100.0f);
+
+	viewMatrix = glm::lookAt(vec3(0.0f, 0.0f, 10.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f,
+		0.0f));
+
+	worldMatrix = glm::translate(mat4(1.0f), vec3(0.0f, 0.0f, 0.0f));
 
 }
 
@@ -335,6 +387,8 @@ int main(int argc, char*arg[]){
 	setViewport(WINDOW_WIDTH, WINDOW_HEIGHT);
 
 	SDL_Event event;
+
+	createShader();
 
 	while (running)
 	{
