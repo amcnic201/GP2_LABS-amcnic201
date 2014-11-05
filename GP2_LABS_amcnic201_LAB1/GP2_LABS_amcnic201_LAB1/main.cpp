@@ -32,7 +32,7 @@ const std::string ASSET_PATH = "assets";
 const std::string SHADER_PATH = "/shaders";
 
 //Global Variables Go Here
-
+GLuint shaderProgram = 0;
 GLuint triangleEBO;
 //Pointer to our SDL Windows
 SDL_Window*window;
@@ -269,7 +269,6 @@ void createShader()
 
 }
 
-GLuint shaderProgram = 0;
 
 //Function to draw
 void render()
