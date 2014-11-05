@@ -89,7 +89,7 @@ bool checkForCompilerErrors(GLuint shaderProgram)
 	return false;
 }
 
-bool checkforLinkErrors(GLuint program)
+bool checkForLinkErrors(GLuint program)
 {
 	GLint isLinked = 0;
 	glGetProgramiv(program, GL_LINK_STATUS, &isLinked);
